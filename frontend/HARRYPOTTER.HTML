@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hogwarts Chat Assistant</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom styles for Harry Potter theme */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&family=IM+Fell+DW+Pica:ital@0;1&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #2A2421; /* Darker base for a richer feel */
+            background-image: url('https://placehold.co/1920x1080/2A2421/4A423F?text=Subtle+Magic+Dust'); /* Base background texture */
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            overflow: hidden; /* Prevent body scroll if content slightly overflows */
+            position: relative; /* For animated overlay */
+        }
+
+        /* Animated magical background overlay */
+        @keyframes magic-flow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+        .magic-background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+            background-size: 200% 200%; /* Make it larger than container to animate */
+            animation: magic-flow 60s linear infinite; /* Slow, continuous flow */
+            pointer-events: none; /* Allows clicks to pass through */
+            z-index: -1; /* Below the main content */
+        }
+
+        /* Applying Cinzel to specific elements for a magical title look */
+        .cinzel-font {
+            font-family: 'Cinzel', serif;
+        }
+        /* Applying IM Fell DW Pica for a more parchment-like text feel */
+        .pica-font {
+            font-family: 'IM Fell DW Pica', serif;
+        }
+
+        /* Custom scrollbar for chat history */
+        .chat-history::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-history::-webkit-scrollbar-track {
+            background: #2D2725; /* Darker background for track */
+            border-radius: 10px;
+        }
+
+        .chat-history::-webkit-scrollbar-thumb {
+            background: #8B5F2A; /* Gold/bronze color for thumb */
+            border-radius: 10px;
+            border: 1px solid #6E4A20;
+        }
+
+        .chat-history::-webkit-scrollbar-thumb:hover {
+            background: #A0733B;
+        }
+
+        /* Basic animation for loading dots */
+        @keyframes blink {
+            0% { opacity: .2; }
+            20% { opacity: 1; }
+            100% { opacity: .2; }
+        }
+        .loading-dots span {
+            animation: blink 1.4s infinite both;
+        }
+        .loading-dots span:nth-child(2) {
+            animation-delay: .2s;
+        }
+        .loading-dots span:nth-child(3) {
+            animation-delay: .4s;
+        }
+
+        /* Header Title Glow Animation */
+        @keyframes text-glow {
+            0%, 100% { text-shadow: 0 0 8px #FFD700, 0 0 15px #FFD700, 0 0 25px #FFD700; }
+            50% { text-shadow: 0 0 12px #E0B800, 0 0 25px #E0B800, 0 0 40px #E0B800; }
+        }
+        .header-glow {
+            animation: text-glow 3s infinite alternate;
+        }
+
+        /* Button Sparkle Effect */
+        @keyframes sparkle {
+            0% { box-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700; }
+            50% { box-shadow: 0 0 15px #E0B800, 0 0 30px #E0B800; }
+            100% { box-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700; }
+        }
+        .sparkle-button:hover {
+            animation: sparkle 0.8s infinite alternate;
+        }
+
+        /* Message bubble gradient */
+        .user-bubble-gradient {
+            background: linear-gradient(135deg, #8B5F2A, #A0733B);
+        }
+        .bot-bubble-gradient {
+            background: linear-gradient(135deg, #4A423F, #6D6664);
+        }
+
+        /* Message entry animation */
+        @keyframes slide-in-fade {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .message-enter-active {
+            animation: slide-in-fade 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Animated magical background overlay -->
+    <div class="magic-background-overlay"></div>
+
+    <div class="flex flex-col w-full max-w-2xl bg-[#2D2725] bg-opacity-95 rounded-xl shadow-2xl overflow-hidden border-4 border-[#8B5F2A]">
+        <!-- Chatbot Header -->
+        <div class="bg-[#6E4A20] text-white p-4 rounded-t-lg flex flex-col items-center justify-center border-b-2 border-[#8B5F2A] relative overflow-hidden">
+            <!-- Subtle magic particles effect (placeholder) -->
+            <div class="absolute inset-0 z-0 opacity-20" style="background-image: url('https://placehold.co/100x100/6E4A20/FFD700?text=✨'); background-size: 20px; animation: sparkle-bg 10s infinite linear;"></div>
+            <img src="https://placehold.co/100x100/6E4A20/FFD700?text=🏰" alt="Hogwarts Crest" class="h-24 w-24 mb-2 rounded-full border-4 border-[#FFD700] p-1 object-cover shadow-lg relative z-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-center w-full cinzel-font header-glow relative z-10">
+                <span class="text-[#FFD700]">Hogwarts</span> Chat Assistant
+            </h1>
+            <p class="text-sm md:text-base pica-font mt-1 relative z-10">Your Guide to the Wizarding World</p>
+        </div>
+
+        <!-- Chat History Area -->
+        <div id="chat-history" class="chat-history flex-1 p-4 overflow-y-auto h-[60vh] md:h-[70vh] flex flex-col space-y-4">
+            <!-- Initial Bot Message -->
+            <div class="flex justify-start items-start space-x-2 message-enter-active">
+                <i class="fas fa-owl text-[#FFD700] text-2xl h-8 w-8 flex-shrink-0 mt-1"></i> <!-- Hedwig (owl) icon -->
+                <div class="bot-bubble-gradient text-white p-3 rounded-xl rounded-bl-none max-w-[80%] shadow-md border border-[#6D6664]">
+                    <p class="text-sm md:text-base pica-font">Welcome, young witch or wizard! I am Harry Potter, ready to enlighten you on the mysteries of the magical world. What wisdom do you seek today?</p>
+                </div>
+            </div>
+            <!-- Loading indicator placeholder -->
+            <div id="loading-indicator" class="flex justify-start hidden items-start space-x-2">
+                <i class="fas fa-spinner fa-spin text-[#FFD700] text-2xl h-8 w-8 flex-shrink-0 mt-1"></i> <!-- Loading spinner icon -->
+                <div class="bot-bubble-gradient text-white p-3 rounded-xl rounded-bl-none max-w-[80%] shadow-md border border-[#6D6664]">
+                    <p class="text-sm md:text-base loading-dots pica-font">Thinking<span>.</span><span>.</span><span>.</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Input Area -->
+        <div class="p-4 bg-[#6E4A20] rounded-b-lg flex items-center space-x-3 border-t-2 border-[#8B5F2A]">
+            <input
+                type="text"
+                id="user-input"
+                placeholder="Whisper your question..."
+                class="flex-1 p-3 rounded-xl bg-[#362E2B] text-white placeholder-[#B8A79A] focus:outline-none focus:ring-2 focus:ring-[#FFD700] border border-[#8B5F2A] pica-font shadow-inner"
+            >
+            <button
+                id="send-button"
+                class="bg-[#FFD700] text-[#6E4A20] font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-[#E0B800] transition duration-200 ease-in-out transform hover:scale-105 border-2 border-[#8B5F2A] flex items-center justify-center space-x-2 sparkle-button"
+            >
+                <i class="fas fa-magic"></i><span>Send</span>
+            </button>
+            <button
+                id="clear-button"
+                class="bg-[#B8A79A] text-[#2D2725] font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-[#9A8C80] transition duration-200 ease-in-out transform hover:scale-105 border-2 border-[#6D6664] text-sm flex items-center justify-center space-x-1 sparkle-button"
+            >
+                <i class="fas fa-flask"></i><span>Clear</span> <!-- Potion icon for clear -->
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-[#2D2725] text-[#B8A79A] text-xs text-center p-2 rounded-b-xl border-t border-[#4A423F] pica-font">
+            &copy; 2025 The Daily Prophet. All rights reserved. Mischief Managed.
+        </div>
+    </div>
+
+    <script>
+        // Get references to DOM elements
+        const chatHistory = document.getElementById('chat-history');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const clearButton = document.getElementById('clear-button');
+        let loadingIndicator = document.getElementById('loading-indicator');
+
+        // The URL for your Node.js backend server's chat endpoint
+        // This will be updated AFTER deployment to Vercel
+        const BACKEND_CHAT_URL = 'YOUR_VERCEL_BACKEND_URL/api/chat'; // Placeholder for Vercel URL
+
+        /**
+         * Adds a message bubble to the chat history.
+         * @param {string} sender - 'user' or 'bot'
+         * @param {string} message - The text message to display.
+         */
+        function addMessage(sender, message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} items-start space-x-2 message-enter-active`;
+
+            // Add sender icon using Font Awesome <i> tag
+            const iconElement = document.createElement('i');
+            iconElement.className = `text-2xl h-8 w-8 flex-shrink-0 mt-1`; // Base styling for icons
+
+            if (sender === 'user') {
+                iconElement.classList.add('fas', 'fa-broom', 'text-[#A0733B]', 'order-2'); // Nimbus 2000 (broom) icon for user
+                messageDiv.classList.add('flex-row-reverse'); // Reverse row for user messages
+            } else {
+                iconElement.classList.add('fas', 'fa-owl', 'text-[#FFD700]'); // Hedwig (owl) icon for bot
+            }
+
+            const bubbleDiv = document.createElement('div');
+            const senderBgClass = sender === 'user' ? 'user-bubble-gradient border-[#A0733B]' : 'bot-bubble-gradient border-[#6D6664]';
+            const borderRadiusClass = sender === 'user' ? 'rounded-br-none' : 'rounded-bl-none';
+
+            bubbleDiv.className = `${senderBgClass} text-white p-3 rounded-xl ${borderRadiusClass} max-w-[80%] shadow-md border`;
+            bubbleDiv.innerHTML = `<p class="text-sm md:text-base pica-font">${message}</p>`;
+
+            messageDiv.appendChild(iconElement);
+            messageDiv.appendChild(bubbleDiv);
+            chatHistory.appendChild(messageDiv);
+
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        /**
+         * Handles sending a message to the AI via the Node.js backend.
+         */
+        async function sendMessage() {
+            const userText = userInput.value.trim();
+            if (userText === '') return;
+
+            addMessage('user', userText);
+            userInput.value = '';
+            userInput.disabled = true;
+            sendButton.disabled = true;
+            clearButton.disabled = true;
+
+            loadingIndicator.classList.remove('hidden');
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            try {
+                const response = await fetch(BACKEND_CHAT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: userText }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`HTTP error! status: ${response.status}, details: ${errorData.error || 'Unknown error'}`);
+                }
+
+                const data = await response.json();
+                const botResponse = data.response;
+
+                loadingIndicator.classList.add('hidden');
+                addMessage('bot', botResponse);
+
+            } catch (error) {
+                loadingIndicator.classList.add('hidden');
+                console.error("Error communicating with the backend:", error);
+                addMessage('bot', "Alas, a magical mishap occurred! I couldn't fetch that information from the castle. Please ensure the backend server is running, or check your internet connection.");
+            } finally {
+                userInput.disabled = false;
+                sendButton.disabled = false;
+                clearButton.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        /**
+         * Clears the chat history.
+         */
+        function clearChat() {
+            chatHistory.innerHTML = `
+                <div class="flex justify-start items-start space-x-2 message-enter-active">
+                    <i class="fas fa-owl text-[#FFD700] text-2xl h-8 w-8 flex-shrink-0 mt-1"></i>
+                    <div class="bot-bubble-gradient text-white p-3 rounded-xl rounded-bl-none max-w-[80%] shadow-md border border-[#6D6664]">
+                        <p class="text-sm md:text-base pica-font">Welcome, young witch or wizard! I am Harry Potter, ready to enlighten you on the mysteries of the magical world. What wisdom do you seek today?</p>
+                    </div>
+                </div>
+                <div id="loading-indicator" class="flex justify-start hidden">
+                    <i class="fas fa-spinner fa-spin text-[#FFD700] text-2xl h-8 w-8 flex-shrink-0 mt-1"></i>
+                    <div class="bot-bubble-gradient text-white p-3 rounded-xl rounded-bl-none max-w-[80%] shadow-md border border-[#6D6664]">
+                        <p class="text-sm md:text-base loading-dots">Thinking<span>.</span><span>.</span><span>.</span></p>
+                    </div>
+                </div>
+            `;
+            loadingIndicator = document.getElementById('loading-indicator');
+            userInput.focus();
+        }
+
+        // Event Listeners
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        clearButton.addEventListener('click', clearChat);
+
+        // Focus on input field when page loads
+        userInput.focus();
+    </script>
+</body>
+</html>
